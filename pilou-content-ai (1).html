@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pilou Content AI 🐣</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Pacifico&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --orange: #FB8F63;
+    --blue-dark: #324A7A;
+    --blue: #5883DA;
+    --blue-light: #C5D7F0;
+    --bg: #F3F5F8;
+    --peach: #F8D3B8;
+    --white: #ffffff;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Nunito',sans-serif; background:var(--bg); min-height:100vh; color:var(--blue-dark); }
+
+  header {
+    background:var(--white); padding:16px 32px;
+    display:flex; align-items:center; gap:12px;
+    box-shadow:0 2px 16px rgba(50,74,122,0.08);
+    position:sticky; top:0; z-index:100;
+  }
+  .logo { width:42px;height:42px;background:var(--orange);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px; }
+  header h1 { font-family:'Pacifico',cursive;font-size:20px;color:var(--blue-dark); }
+  header small { font-size:11px;color:var(--blue);font-weight:700;background:var(--blue-light);padding:3px 10px;border-radius:20px;margin-left:6px; }
+
+  main { max-width:780px;margin:0 auto;padding:32px 16px 80px; }
+  .intro { text-align:center;margin-bottom:28px; }
+  .intro h2 { font-size:24px;font-weight:900;margin-bottom:6px; }
+  .intro p { font-size:14px;color:var(--blue);font-weight:600; }
+
+  /* API BANNER */
+  .api-banner { background:linear-gradient(135deg,#FFF5F0,#fff);border:2px solid var(--orange);border-radius:16px;padding:20px;margin-bottom:20px; }
+  .api-banner h3 { font-size:14px;font-weight:900;color:var(--orange);margin-bottom:8px; }
+  .api-banner p { font-size:12px;color:var(--blue-dark);line-height:1.6;margin-bottom:10px; }
+  .api-banner a { color:var(--blue);font-weight:800; }
+  .api-row { display:flex;gap:8px; }
+  .api-row input { flex:1;border:2px solid var(--blue-light);border-radius:10px;padding:10px 14px;font-family:'Nunito',sans-serif;font-size:13px;outline:none;color:var(--blue-dark); }
+  .api-row input:focus { border-color:var(--orange); }
+  .api-row button { background:var(--orange);color:#fff;border:none;border-radius:10px;padding:10px 16px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer; }
+  .api-ok { font-size:12px;color:#2e7d32;font-weight:800;margin-top:8px;display:none; }
+
+  /* CARD */
+  .card { background:var(--white);border-radius:20px;padding:24px;margin-bottom:16px;box-shadow:0 4px 20px rgba(50,74,122,0.07); }
+  .card-title { font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;color:var(--orange);margin-bottom:14px;display:flex;align-items:center;gap:8px; }
+  .optional-badge { font-size:10px;background:var(--blue-light);color:var(--blue-dark);padding:2px 8px;border-radius:20px;letter-spacing:0;text-transform:none;font-weight:700; }
+
+  /* FORMAT */
+  .format-grid { display:grid;grid-template-columns:repeat(3,1fr);gap:10px; }
+  .format-btn { border:2.5px solid var(--blue-light);background:var(--white);border-radius:14px;padding:16px 8px;cursor:pointer;text-align:center;transition:all 0.2s;font-family:'Nunito',sans-serif; }
+  .format-btn:hover,.format-btn.active { border-color:var(--orange);background:#FFF5F0; }
+  .format-btn .fi { font-size:26px;margin-bottom:6px; }
+  .format-btn .fl { font-size:13px;font-weight:900;color:var(--blue-dark); }
+  .format-btn .fd { font-size:11px;color:var(--blue);margin-top:3px; }
+
+  /* OBJECTIF */
+  .obj-grid { display:grid;grid-template-columns:repeat(3,1fr);gap:8px; }
+  .obj-btn { border:2.5px solid var(--blue-light);background:var(--white);border-radius:12px;padding:10px 8px;cursor:pointer;font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;color:var(--blue-dark);transition:all 0.2s; }
+  .obj-btn:hover,.obj-btn.active { border-color:var(--blue);background:#EEF3FC; }
+  .obj-btn.autre-btn { grid-column:span 3;border-style:dashed; }
+  .obj-btn.autre-btn.active { border-style:solid; }
+  .autre-input { display:none;margin-top:10px; }
+  .autre-input input { width:100%;border:2px solid var(--blue-light);border-radius:10px;padding:10px 14px;font-family:'Nunito',sans-serif;font-size:13px;outline:none;color:var(--blue-dark);background:#FAFBFF; }
+  .autre-input input:focus { border-color:var(--orange); }
+
+  /* UPLOAD */
+  .upload-zone { border:2.5px dashed var(--blue-light);border-radius:14px;padding:28px;text-align:center;cursor:pointer;transition:all 0.2s;background:#FAFBFF;position:relative; }
+  .upload-zone:hover { border-color:var(--orange);background:#FFF5F0; }
+  .upload-zone.has-img { border-color:var(--orange);background:#FFF5F0;padding:14px; }
+  .upload-zone input[type="file"] { position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%; }
+  .preview-row { display:flex;flex-wrap:wrap;gap:8px;justify-content:center; }
+  .preview-row img { width:80px;height:80px;object-fit:cover;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,0.12); }
+
+  /* MOOD BOARD */
+  .mood-grid { display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:14px; }
+  .mood-upload-zone { border:2px dashed var(--blue-light);border-radius:12px;padding:18px;text-align:center;cursor:pointer;transition:all 0.2s;background:#FAFBFF;position:relative;min-height:100px;display:flex;flex-direction:column;align-items:center;justify-content:center; }
+  .mood-upload-zone:hover { border-color:var(--orange);background:#FFF5F0; }
+  .mood-upload-zone.has-img { border-color:var(--peach);padding:8px; }
+  .mood-upload-zone input[type="file"] { position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%; }
+  .mood-upload-zone img { width:100%;height:80px;object-fit:cover;border-radius:8px; }
+  .mood-upload-zone .mood-label { font-size:11px;font-weight:800;color:var(--blue);margin-top:6px; }
+  .mood-upload-zone .mood-icon { font-size:22px;margin-bottom:4px; }
+  .mood-desc { font-size:12px;color:var(--blue-dark);line-height:1.6;background:var(--blue-light);border-radius:10px;padding:10px 12px;margin-bottom:0; }
+
+  /* TEXTAREA */
+  textarea { width:100%;border:2.5px solid var(--blue-light);border-radius:12px;padding:14px;font-family:'Nunito',sans-serif;font-size:14px;color:var(--blue-dark);resize:vertical;min-height:90px;outline:none;background:#FAFBFF; }
+  textarea:focus { border-color:var(--orange);background:#fff; }
+  textarea::placeholder { color:#A0ADBF; }
+
+  /* BOUTON GÉNÉRER */
+  .btn-gen { width:100%;background:var(--orange);color:#fff;border:none;border-radius:14px;padding:18px;font-family:'Nunito',sans-serif;font-size:16px;font-weight:900;cursor:pointer;box-shadow:0 6px 20px rgba(251,143,99,0.35);display:flex;align-items:center;justify-content:center;gap:8px;transition:all 0.2s; }
+  .btn-gen:hover { background:#f07d4e;transform:translateY(-2px); }
+
+  /* LOADER */
+  .loader { display:none;text-align:center;padding:60px 20px; }
+  .dots { display:flex;justify-content:center;gap:8px;margin-bottom:16px; }
+  .dots span { width:13px;height:13px;background:var(--orange);border-radius:50%;animation:bounce 1.2s infinite; }
+  .dots span:nth-child(2){animation-delay:0.2s}
+  .dots span:nth-child(3){animation-delay:0.4s}
+  @keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-14px)}}
+  .loader p { font-weight:800;color:var(--blue);font-size:15px; }
+
+  /* RÉSULTATS */
+  #results { display:none; }
+  .slides-row { display:flex;gap:10px;overflow-x:auto;padding-bottom:8px; }
+  .slide-card { min-width:170px;background:linear-gradient(135deg,#FFF5F0,#fff);border:2px solid var(--peach);border-radius:14px;padding:14px;flex-shrink:0; }
+  .slide-num { font-size:10px;font-weight:800;color:var(--orange);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px; }
+  .slide-title { font-size:13px;font-weight:900;color:var(--blue-dark);margin-bottom:6px;line-height:1.3; }
+  .slide-text { font-size:11px;color:var(--blue);line-height:1.5; }
+  .visual-tag { display:inline-block;background:var(--blue-light);color:var(--blue-dark);font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;margin:3px 3px 3px 0; }
+  .caption-box { background:#FAFBFF;border:2px solid var(--blue-light);border-radius:12px;padding:14px;font-size:14px;line-height:1.7;white-space:pre-wrap; }
+  .hashtag-box { display:flex;flex-wrap:wrap;gap:6px; }
+  .hashtag { background:var(--peach);color:var(--blue-dark);font-size:12px;font-weight:700;padding:5px 12px;border-radius:20px; }
+  .csv-box { background:#1e2d3d;color:#a8d8a8;border-radius:12px;padding:14px;font-family:monospace;font-size:12px;line-height:1.6;overflow-x:auto;white-space:pre; }
+  .result-label { font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1.2px;color:var(--blue);margin-bottom:10px; }
+  .btn-row { display:flex;gap:10px;margin-top:12px;flex-wrap:wrap; }
+  .btn-copy { flex:1;min-width:140px;padding:11px 14px;border-radius:12px;background:var(--blue-light);color:var(--blue-dark);border:none;font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer;transition:all 0.2s; }
+  .btn-copy:hover { background:var(--blue);color:#fff; }
+  .btn-dl { flex:1;min-width:140px;padding:11px 14px;border-radius:12px;background:var(--orange);color:#fff;border:none;font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer; }
+  .btn-dl:hover { background:#f07d4e; }
+  .btn-new { width:100%;padding:14px;border-radius:14px;background:#fff;border:2.5px solid var(--orange);color:var(--orange);font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;cursor:pointer;margin-top:8px; }
+  .btn-new:hover { background:var(--orange);color:#fff; }
+
+  /* TOAST */
+  .toast { position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--blue-dark);color:#fff;padding:12px 24px;border-radius:30px;font-weight:700;font-size:14px;transition:transform 0.3s;z-index:999;white-space:nowrap; }
+  .toast.show { transform:translateX(-50%) translateY(0); }
+
+  @media(max-width:600px){
+    .format-grid { grid-template-columns:repeat(2,1fr); }
+    .obj-grid { grid-template-columns:repeat(2,1fr); }
+    .obj-btn.autre-btn { grid-column:span 2; }
+    .mood-grid { grid-template-columns:1fr; }
+    header { padding:14px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">🐣</div>
+  <h1>Pilou Content AI</h1>
+  <small>La Maison de Pilou ✨</small>
+</header>
+
+<main>
+  <div class="intro">
+    <h2>Crée ton contenu en 30 secondes 🧡</h2>
+    <p>Uploade tes images, dis ce que tu veux — l'IA fait tout dans l'univers Pilou</p>
+  </div>
+
+  <!-- CLÉ API -->
+  <div class="api-banner">
+    <h3>🔑 Ta clé API Anthropic (une seule fois)</h3>
+    <p>Pour que l'IA fonctionne, tu as besoin d'une clé API gratuite.<br>
+    1. Va sur <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a><br>
+    2. Crée un compte → clique sur <strong>"API Keys"</strong> → <strong>"Create Key"</strong><br>
+    3. Copie-la ici. Elle sera sauvegardée sur ton ordi uniquement, personne d'autre ne la voit.</p>
+    <div class="api-row">
+      <input type="password" id="api-key-input" placeholder="sk-ant-api03-..." />
+      <button onclick="saveApiKey()">Enregistrer</button>
+    </div>
+    <div class="api-ok" id="api-ok">✅ Clé enregistrée ! Tu peux créer ton contenu.</div>
+  </div>
+
+  <!-- FORMULAIRE -->
+  <div id="form-section">
+
+    <!-- ÉTAPE 1 : FORMAT -->
+    <div class="card">
+      <div class="card-title">📐 Étape 1 — Format</div>
+      <div class="format-grid">
+        <button class="format-btn active" onclick="selectFormat(this,'carrousel')">
+          <div class="fi">🎠</div><div class="fl">Carrousel</div><div class="fd">3 à 6 slides</div>
+        </button>
+        <button class="format-btn" onclick="selectFormat(this,'post')">
+          <div class="fi">🖼️</div><div class="fl">Publication</div><div class="fd">1 visuel fort</div>
+        </button>
+        <button class="format-btn" onclick="selectFormat(this,'story')">
+          <div class="fi">📱</div><div class="fl">Story</div><div class="fd">Format vertical</div>
+        </button>
+      </div>
+    </div>
+
+    <!-- ÉTAPE 2 : OBJECTIF -->
+    <div class="card">
+      <div class="card-title">🎯 Étape 2 — Objectif</div>
+      <div class="obj-grid">
+        <button class="obj-btn active" onclick="selectObj(this,'rassurer les parents')">💛 Rassurer les parents</button>
+        <button class="obj-btn" onclick="selectObj(this,'recrutement équipe')">🙋 Recrutement</button>
+        <button class="obj-btn" onclick="selectObj(this,'visibilité et notoriété')">✨ Visibilité</button>
+        <button class="obj-btn" onclick="selectObj(this,'vie quotidienne à la crèche')">🏡 Vie à la crèche</button>
+        <button class="obj-btn" onclick="selectObj(this,'pédagogie et éveil')">🎨 Pédagogie</button>
+        <button class="obj-btn" onclick="selectObj(this,'événement spécial')">🎉 Événement</button>
+        <button class="obj-btn autre-btn" onclick="selectObj(this,'autre')" id="autre-btn">✏️ Autre — précise ton objectif</button>
+      </div>
+      <div class="autre-input" id="autre-input">
+        <input type="text" id="autre-text" placeholder="Ex : Annoncer notre nouvelle crèche à Bourg-en-Bresse..." />
+      </div>
+    </div>
+
+    <!-- ÉTAPE 3 : IMAGES -->
+    <div class="card">
+      <div class="card-title">🖼️ Étape 3 — Tes images <span class="optional-badge">optionnel</span></div>
+      <div class="upload-zone" id="upload-zone">
+        <input type="file" id="img-input" accept="image/*" multiple onchange="handleImages(event)">
+        <div id="upload-placeholder">
+          <div style="font-size:32px;margin-bottom:8px">📸</div>
+          <div style="font-weight:800;font-size:14px">Clique pour ajouter tes photos</div>
+          <div style="font-size:12px;color:var(--blue);margin-top:4px">JPG, PNG — plusieurs photos pour un carrousel</div>
+        </div>
+        <div class="preview-row" id="preview-row" style="display:none"></div>
+      </div>
+    </div>
+
+    <!-- ÉTAPE 4 : MOOD BOARD -->
+    <div class="card">
+      <div class="card-title">🎨 Étape 4 — Mood board <span class="optional-badge">optionnel</span></div>
+      <div class="mood-desc" style="margin-bottom:12px">
+        Tu veux un style particulier pour ce post ? Ajoute jusqu'à 4 images d'inspiration (tons, ambiance, mise en page...) et l'IA s'en inspirera pour ses suggestions visuelles Canva.
+      </div>
+      <div class="mood-grid">
+        <div class="mood-upload-zone" id="mood-zone-0" onclick="document.getElementById('mood-input-0').click()">
+          <input type="file" id="mood-input-0" accept="image/*" style="display:none" onchange="handleMood(event,0)">
+          <div class="mood-icon">🖼️</div>
+          <div class="mood-label">Inspo 1</div>
+        </div>
+        <div class="mood-upload-zone" id="mood-zone-1" onclick="document.getElementById('mood-input-1').click()">
+          <input type="file" id="mood-input-1" accept="image/*" style="display:none" onchange="handleMood(event,1)">
+          <div class="mood-icon">🖼️</div>
+          <div class="mood-label">Inspo 2</div>
+        </div>
+        <div class="mood-upload-zone" id="mood-zone-2" onclick="document.getElementById('mood-input-2').click()">
+          <input type="file" id="mood-input-2" accept="image/*" style="display:none" onchange="handleMood(event,2)">
+          <div class="mood-icon">🖼️</div>
+          <div class="mood-label">Inspo 3</div>
+        </div>
+        <div class="mood-upload-zone" id="mood-zone-3" onclick="document.getElementById('mood-input-3').click()">
+          <input type="file" id="mood-input-3" accept="image/*" style="display:none" onchange="handleMood(event,3)">
+          <div class="mood-icon">🖼️</div>
+          <div class="mood-label">Inspo 4</div>
+        </div>
+      </div>
+      <textarea id="mood-text" placeholder="Tu peux aussi décrire l'ambiance en mots : Ex : tons chauds et doux, beaucoup de blanc, typographie arrondie, ambiance cocooning..." style="min-height:70px;margin-top:4px"></textarea>
+    </div>
+
+    <!-- ÉTAPE 5 : IDÉE -->
+    <div class="card">
+      <div class="card-title">💡 Étape 5 — Ton idée en quelques mots</div>
+      <textarea id="idea" placeholder="Ex : Les pilous ont fait de la peinture ce matin, ambiance joyeuse et colorée. Je veux montrer que la crèche c'est un endroit de découverte..."></textarea>
+    </div>
+
+    <button class="btn-gen" onclick="generate()">✨ Générer mon contenu Pilou</button>
+
+  </div>
+
+  <!-- LOADER -->
+  <div class="loader" id="loader">
+    <div class="dots"><span></span><span></span><span></span></div>
+    <p>Pilou prépare ton contenu... 🐣</p>
+  </div>
+
+  <!-- RÉSULTATS -->
+  <div id="results">
+
+    <div class="card">
+      <div class="card-title">🎠 Contenu des slides</div>
+      <div class="slides-row" id="slides-out"></div>
+      <div style="margin-top:18px">
+        <div class="result-label">🎨 Suggestions visuelles pour Canva</div>
+        <div id="visuals-out"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📝 Légende Instagram</div>
+      <div class="caption-box" id="caption-out"></div>
+      <div class="btn-row">
+        <button class="btn-copy" onclick="copyEl('caption-out')">📋 Copier la légende</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"># Hashtags</div>
+      <div class="hashtag-box" id="hashtags-out"></div>
+      <div class="btn-row">
+        <button class="btn-copy" onclick="copyHashtags()">📋 Copier les hashtags</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📊 CSV pour Canva — Créer en masse</div>
+      <div class="csv-box" id="csv-out"></div>
+      <div class="btn-row">
+        <button class="btn-copy" onclick="copyEl('csv-out')">📋 Copier</button>
+        <button class="btn-dl" onclick="downloadCSV()">⬇️ Télécharger .csv</button>
+      </div>
+    </div>
+
+    <button class="btn-new" onclick="resetForm()">🔄 Créer un nouveau contenu</button>
+  </div>
+
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  let selectedFormat = 'carrousel';
+  let selectedObj = 'rassurer les parents';
+  let uploadedFiles = [];
+  let moodFiles = [null, null, null, null];
+  let currentCSV = '';
+
+  window.onload = () => {
+    const saved = localStorage.getItem('pilou_api_key');
+    if (saved) {
+      document.getElementById('api-key-input').value = saved;
+      document.getElementById('api-ok').style.display = 'block';
+    }
+  };
+
+  function saveApiKey() {
+    const key = document.getElementById('api-key-input').value.trim();
+    if (!key.startsWith('sk-')) { showToast('❌ Clé invalide, elle commence par sk-ant-...'); return; }
+    localStorage.setItem('pilou_api_key', key);
+    document.getElementById('api-ok').style.display = 'block';
+    showToast('✅ Clé enregistrée !');
+  }
+
+  function selectFormat(btn, f) {
+    document.querySelectorAll('.format-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedFormat = f;
+  }
+
+  function selectObj(btn, o) {
+    document.querySelectorAll('.obj-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedObj = o;
+    const autreInput = document.getElementById('autre-input');
+    autreInput.style.display = (o === 'autre') ? 'block' : 'none';
+  }
+
+  function handleImages(e) {
+    uploadedFiles = Array.from(e.target.files);
+    const zone = document.getElementById('upload-zone');
+    const placeholder = document.getElementById('upload-placeholder');
+    const preview = document.getElementById('preview-row');
+    placeholder.style.display = 'none';
+    preview.style.display = 'flex';
+    preview.innerHTML = '';
+    zone.classList.add('has-img');
+    uploadedFiles.forEach(f => {
+      const reader = new FileReader();
+      reader.onload = ev => {
+        const img = document.createElement('img');
+        img.src = ev.target.result;
+        preview.appendChild(img);
+      };
+      reader.readAsDataURL(f);
+    });
+    const note = document.createElement('div');
+    note.style = 'width:100%;font-size:12px;color:var(--orange);font-weight:700;margin-top:6px;text-align:center';
+    note.textContent = `✅ ${uploadedFiles.length} image(s) chargée(s) — clique pour changer`;
+    preview.appendChild(note);
+  }
+
+  function handleMood(e, index) {
+    const file = e.target.files[0];
+    if (!file) return;
+    moodFiles[index] = file;
+    const zone = document.getElementById(`mood-zone-${index}`);
+    const reader = new FileReader();
+    reader.onload = ev => {
+      zone.innerHTML = `
+        <input type="file" id="mood-input-${index}" accept="image/*" style="display:none" onchange="handleMood(event,${index})">
+        <img src="${ev.target.result}" alt="inspo ${index+1}">
+        <div class="mood-label" style="color:var(--orange)">✅ Inspo ${index+1}</div>`;
+      zone.classList.add('has-img');
+      // Réattacher le click
+      zone.onclick = () => document.getElementById(`mood-input-${index}`).click();
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function toBase64(file) {
+    return new Promise((res, rej) => {
+      const r = new FileReader();
+      r.onload = () => res(r.result.split(',')[1]);
+      r.onerror = rej;
+      r.readAsDataURL(file);
+    });
+  }
+
+  async function generate() {
+    const apiKey = localStorage.getItem('pilou_api_key');
+    if (!apiKey) { showToast('🔑 Entre ta clé API d\'abord !'); return; }
+
+    const idea = document.getElementById('idea').value.trim();
+    if (!idea) { showToast('✍️ Décris ton idée en quelques mots !'); return; }
+
+    // Objectif final
+    let finalObj = selectedObj;
+    if (selectedObj === 'autre') {
+      const autreText = document.getElementById('autre-text').value.trim();
+      if (!autreText) { showToast('✍️ Précise ton objectif !'); return; }
+      finalObj = autreText;
+    }
+
+    const moodText = document.getElementById('mood-text').value.trim();
+    const moodImagesPresent = moodFiles.filter(f => f !== null);
+
+    document.getElementById('form-section').style.display = 'none';
+    document.getElementById('loader').style.display = 'block';
+    document.getElementById('results').style.display = 'none';
+
+    const formatLabel = {
+      carrousel: 'carrousel Instagram (3 à 6 slides)',
+      post: 'publication Instagram standard (1 visuel)',
+      story: 'story Instagram verticale (1 à 3 écrans)'
+    }[selectedFormat];
+
+    const contentParts = [];
+
+    // Images principales
+    for (const file of uploadedFiles) {
+      const b64 = await toBase64(file);
+      contentParts.push({ type:'image', source:{ type:'base64', media_type:file.type, data:b64 } });
+    }
+
+    // Images mood board
+    for (const file of moodImagesPresent) {
+      const b64 = await toBase64(file);
+      contentParts.push({ type:'image', source:{ type:'base64', media_type:file.type, data:b64 } });
+    }
+
+    let moodSection = '';
+    if (moodImagesPresent.length > 0 || moodText) {
+      moodSection = `\nMOOD BOARD :`;
+      if (moodImagesPresent.length > 0) moodSection += `\n- ${moodImagesPresent.length} image(s) d'inspiration fournies (les dernières images jointes) — inspire-toi de leur ambiance, leurs tons et leur style pour les suggestions visuelles Canva.`;
+      if (moodText) moodSection += `\n- Description de l'ambiance souhaitée : ${moodText}`;
+    }
+
+    contentParts.push({ type:'text', text:`Crée un contenu ${formatLabel} pour La Maison de Pilou.
+Objectif : ${finalObj}
+Idée de Nadège : ${idea}
+${uploadedFiles.length > 0 ? `Images du post fournies : ${uploadedFiles.length} photo(s) (les premières images jointes).` : "Pas d'images pour le post."}${moodSection}
+
+Réponds avec ce JSON exact, rien d'autre :
+{
+  "slides": [
+    { "numero": 1, "titre": "TITRE ACCROCHEUR EN MAJUSCULES", "texte": "Texte de la slide", "visuel": "Description précise du visuel pour Canva" }
+  ],
+  "legende": "Légende Instagram complète avec émojis et appel à l'action doux",
+  "hashtags": ["hashtag1", "hashtag2", "hashtag3", "hashtag4", "hashtag5"],
+  "csv_rows": ["1|TITRE|Texte|Visuel"]
+}` });
+
+    try {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method:'POST',
+        headers:{
+          'Content-Type':'application/json',
+          'x-api-key': apiKey,
+          'anthropic-version':'2023-06-01',
+          'anthropic-dangerous-direct-browser-access':'true'
+        },
+        body: JSON.stringify({
+          model:'claude-sonnet-4-20250514',
+          max_tokens:1500,
+          system:`Tu es l'assistante création de contenu de Nadège, community manager de La Maison de Pilou, micro-crèches dans l'Ain et le Rhône.
+IDENTITÉ DE MARQUE : couleur principale #FB8F63 (orange Pilou), couleurs secondaires #324A7A, #5883DA, #F8D3B8. Typographies : Kraftstoff (titres), Banda (sous-titres). Ton doux, chaleureux, bienveillant, parfois une touche d'humour léger. Les enfants s'appellent "les pilous". Slogan "À la crèche comme chez vous". Instagram @lamaisondepilou.creches.
+RÈGLES : phrases courtes, émojis avec parcimonie, appel à l'action doux, jamais de jargon.
+Tu réponds UNIQUEMENT en JSON valide, sans markdown, sans backticks, sans texte avant ou après.`,
+          messages:[{ role:'user', content:contentParts }]
+        })
+      });
+
+      const data = await res.json();
+      if (data.error) throw new Error(data.error.message);
+      const raw = data.content.map(i => i.text||'').join('');
+      const clean = raw.replace(/```json|```/g,'').trim();
+      const parsed = JSON.parse(clean);
+      displayResults(parsed);
+
+    } catch(err) {
+      console.error(err);
+      showToast('❌ Erreur : ' + (err.message||'Réessaie !'));
+      document.getElementById('form-section').style.display = 'block';
+      document.getElementById('loader').style.display = 'none';
+    }
+  }
+
+  function displayResults(r) {
+    document.getElementById('loader').style.display = 'none';
+    document.getElementById('results').style.display = 'block';
+
+    // Slides
+    const slidesOut = document.getElementById('slides-out');
+    slidesOut.innerHTML = '';
+    r.slides.forEach(s => {
+      slidesOut.innerHTML += `<div class="slide-card">
+        <div class="slide-num">Slide ${s.numero}</div>
+        <div class="slide-title">${s.titre}</div>
+        <div class="slide-text">${s.texte}</div>
+      </div>`;
+    });
+
+    // Visuels
+    document.getElementById('visuals-out').innerHTML = r.slides.map(s =>
+      `<span class="visual-tag">Slide ${s.numero} : ${s.visuel}</span>`
+    ).join('');
+
+    // Légende
+    document.getElementById('caption-out').textContent = r.legende;
+
+    // Hashtags
+    document.getElementById('hashtags-out').innerHTML = r.hashtags.map(h =>
+      `<span class="hashtag">#${h.replace('#','')}</span>`
+    ).join('');
+
+    // CSV
+    const csvLines = ['Slide_Number|Titre_Banda|Texte_Banda|Visuel_Suggestion', ...r.csv_rows];
+    currentCSV = csvLines.join('\n');
+    document.getElementById('csv-out').textContent = currentCSV;
+
+    window.scrollTo({ top:document.getElementById('results').offsetTop - 20, behavior:'smooth' });
+  }
+
+  function copyEl(id) {
+    navigator.clipboard.writeText(document.getElementById(id).textContent);
+    showToast('✅ Copié !');
+  }
+
+  function copyHashtags() {
+    const tags = Array.from(document.querySelectorAll('.hashtag')).map(h=>h.textContent).join(' ');
+    navigator.clipboard.writeText(tags);
+    showToast('✅ Hashtags copiés !');
+  }
+
+  function downloadCSV() {
+    const blob = new Blob([currentCSV], {type:'text/csv;charset=utf-8;'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'pilou_canva.csv';
+    a.click();
+    showToast('⬇️ Fichier téléchargé !');
+  }
+
+  function resetForm() {
+    document.getElementById('form-section').style.display = 'block';
+    document.getElementById('results').style.display = 'none';
+    document.getElementById('loader').style.display = 'none';
+    document.getElementById('idea').value = '';
+    document.getElementById('mood-text').value = '';
+    document.getElementById('autre-text').value = '';
+    document.getElementById('autre-input').style.display = 'none';
+    document.getElementById('preview-row').innerHTML = '';
+    document.getElementById('preview-row').style.display = 'none';
+    document.getElementById('upload-placeholder').style.display = 'block';
+    document.getElementById('upload-zone').classList.remove('has-img');
+    document.getElementById('img-input').value = '';
+    uploadedFiles = [];
+    moodFiles = [null, null, null, null];
+    // Reset mood zones
+    [0,1,2,3].forEach(i => {
+      const zone = document.getElementById(`mood-zone-${i}`);
+      zone.classList.remove('has-img');
+      zone.innerHTML = `
+        <input type="file" id="mood-input-${i}" accept="image/*" style="display:none" onchange="handleMood(event,${i})">
+        <div class="mood-icon">🖼️</div>
+        <div class="mood-label">Inspo ${i+1}</div>`;
+      zone.onclick = () => document.getElementById(`mood-input-${i}`).click();
+    });
+    // Reset objectif
+    document.querySelectorAll('.obj-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector('.obj-btn').classList.add('active');
+    selectedObj = 'rassurer les parents';
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2800);
+  }
+</script>
+</body>
+</html>
